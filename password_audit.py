@@ -15,6 +15,22 @@ from typing import Dict, List, Tuple
 
 
 def lint_password(pwd: str) -> Dict[str, str]:
+    """
+    Analyze password strength.
+    
+    Checks password against common strength requirements:
+    - Minimum length (12 characters)
+    - Uppercase letters
+    - Lowercase letters
+    - Digits
+    - Special characters
+    
+    Args:
+        pwd: Password to analyze.
+        
+    Returns:
+        Dictionary with password, status ("ok" or "weak"), and findings list.
+    """
     findings = []
     if len(pwd) < 12:
         findings.append("too short (<12)")
@@ -24,7 +40,7 @@ def lint_password(pwd: str) -> Dict[str, str]:
         findings.append("no lowercase")
     if not re.search(r"[0-9]", pwd):
         findings.append("no digit")
-    if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", pwd):
+    if not re.search(r"[!@#$%^&*(),.?":{}|<>]", pwd):
         findings.append("no symbol")
     return {"password": pwd, "status": "weak" if findings else "ok", "findings": findings}
 
@@ -40,6 +56,19 @@ def load_hashes(path: str) -> List[str]:
 
 
 def crack_hashes(hashes: List[str], wordlist: List[str]) -> List[Tuple[str, str]]:
+    """
+    Attempt to crack hashes using a wordlist.
+    
+    Tests each word in the wordlist against all provided hashes
+    using SHA256, SHA1, and MD5 algorithms.
+    
+    Args:
+        hashes: List of hash values to crack.
+        wordlist: List of candidate passwords.
+        
+    Returns:
+        List of tuples (hash, plaintext) for successfully cracked hashes.
+    """
     hits: List[Tuple[str, str]] = []
     for word in wordlist:
         for algo in ("sha256", "sha1", "md5"):
