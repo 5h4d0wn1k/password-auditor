@@ -3,143 +3,50 @@
 > or hold explicit written authorization to assess**. Unauthorized use is
 > prohibited and may be illegal. Read [ETHICS.md](ETHICS.md) and
 > [SCOPE.md](SCOPE.md) before use. Use at your own risk; **AS IS**, no warranty.
-# Password & Hash Auditor
 
-⚠️ **EDUCATIONAL PURPOSE ONLY** - This tool is designed for authorized security testing and educational purposes. Only use on passwords/hashes you own or have explicit written authorization to test.
+# Password Auditor
 
-## Overview
+![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
+![GitHub Stars](https://img.shields.io/github/stars/5h4d0wn1k/password-auditor)
+![Last Commit](https://img.shields.io/github/last-commit/5h4d0wn1k/password-auditor)
+![GitHub Issues](https://img.shields.io/github/issues/5h4d0wn1k/password-auditor)
 
-A password strength analyzer and hash auditor that checks password strength and optionally performs offline hash cracking using wordlists. Designed for security audits and educational purposes.
+> **Password strength analyzer and hash auditor** — a CLI that lints plaintext
+> passwords against policy and runs offline wordlist attacks on SHA-256, SHA-1
+> and MD5 hashes, for authorized security testing and security education.
+
+## Why
+
+Weak and reused passwords remain the leading entry point for account takeover.
+This auditor closes the loop for defenders and educators: `--lint` scores
+own-lab password lists against a 12-character, all-charset policy, while
+`--hashes` + `--wordlist` demonstrates how fast unsalted legacy hashes
+(SHA-1/MD5) fall to a wordlist offline. Everything stays on files you own —
+passwords and hashes never leave the machine, and no network is touched. Use it
+to prove why password managers, MFA, and modern KDF hashing matter.
 
 ## Features
 
-- **Password Strength Analysis**: Checks password length, complexity, and common patterns
-- **Hash Cracking**: Offline hash cracking (SHA256, SHA1, MD5)
-- **Wordlist Support**: Use custom wordlists for hash cracking
-- **JSON Output**: Machine-readable results
-- **Educational**: Learn about password security
+- **Policy linting** — flags passwords shorter than 12 chars or missing
+  uppercase, lowercase, digit, or symbol classes; returns `ok`/`weak` per entry.
+- **Offline hash auditing** — tests wordlist candidates against SHA-256, SHA-1
+  and MD5 hashes with no network access.
+- **Wordlist support** — bring your own list; one password or hash per line.
+- **JSON export** — `--json-out` writes machine-readable findings for reports.
 
-## Installation
-
-### Requirements
-
-- Python 3.8+
-- Standard library only (no external dependencies!)
-
-### Setup
+## Quickstart
 
 ```bash
-# Clone the repository
-git clone https://github.com/5h4d0wn1k/password-auditor.git
-cd password-auditor
-
-# No installation needed!
+# Python 3.8+; stdlib only, nothing to install
 python password_audit.py --help
-```
 
-## Usage
-
-### Password Strength Analysis
-
-```bash
-# Analyze passwords from file
+# Lint a password list (one password per line)
 python password_audit.py --lint passwords.txt
-```
 
-### Hash Cracking
+# Audit hashes with a wordlist (sha256/sha1/md5)
+python password_audit.py --hashes hashes.txt --wordlist wordlist.txt
 
-```bash
-# Crack hashes using wordlist
-python password_audit.py \
-  --hashes hashes.txt \
-  --wordlist wordlist.txt
-```
-
-### Combined Analysis
-
-```bash
-# Analyze passwords and crack hashes
-python password_audit.py \
-  --lint passwords.txt \
-  --hashes hashes.txt \
-  --wordlist wordlist.txt \
-  --json-out results.json
-```
-
-## Command-Line Options
-
-| Option | Description |
-|--------|-------------|
-| `--lint` | File with plaintext passwords to analyze (one per line) |
-| `--hashes` | File with hashes to crack (SHA256, SHA1, MD5) |
-| `--wordlist` | Wordlist file for hash cracking |
-| `--json-out` | Save results to JSON file |
-
-## Password Strength Criteria
-
-Passwords are checked for:
-
-- **Minimum Length**: 12 characters
-- **Uppercase Letters**: At least one A-Z
-- **Lowercase Letters**: At least one a-z
-- **Digits**: At least one 0-9
-- **Special Characters**: At least one symbol
-
-## Hash Algorithms Supported
-
-- **SHA256**: Secure hash algorithm
-- **SHA1**: Legacy hash algorithm
-- **MD5**: Legacy hash algorithm (weak)
-
-## Output Format
-
-### Console Output
-
-```json
-{
-  "lint": [
-    {
-      "password": "weakpass",
-      "status": "weak",
-      "findings": ["too short (<12)", "no uppercase", "no digit", "no symbol"]
-    },
-    {
-      "password": "StrongPass123!",
-      "status": "ok",
-      "findings": []
-    }
-  ],
-  "hash_audit": [
-    {
-      "hash": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
-      "plaintext": "password"
-    }
-  ]
-}
-```
-
-## Examples
-
-### Example 1: Password Strength Check
-
-```bash
-# Check password strength
-python password_audit.py --lint passwords.txt
-```
-
-### Example 2: Hash Cracking
-
-```bash
-# Crack hashes
-python password_audit.py \
-  --hashes hashes.txt \
-  --wordlist rockyou.txt
-```
-
-### Example 3: Save Results
-
-```bash
-# Save results to JSON
+# Combined run with JSON results
 python password_audit.py \
   --lint passwords.txt \
   --hashes hashes.txt \
@@ -147,57 +54,38 @@ python password_audit.py \
   --json-out audit_results.json
 ```
 
-## Use Cases
+## Command-line options
 
-- **Security Audits**: Check password policies
-- **Penetration Testing**: Authorized security assessments
-- **Educational Purposes**: Learn about password security
+| Option | Description |
+|---|---|
+| `--lint FILE` | plaintext password file (one per line) to policy-lint |
+| `--hashes FILE` | hash file (sha256/sha1/md5, one per line) to audit |
+| `--wordlist FILE` | candidate wordlist for the offline hash audit |
+| `--json-out FILE` | write JSON results instead of printing to stdout |
+
+## Project structure
+
+```
+password_audit.py   # CLI + lint/hash-audit engine (stdlib)
+requirements.txt    # no external deps; stdlib only
+ETHICS.md           # ethics/authorized-use policy (read first)
+SCOPE.md            # defined assessment scope
+```
+
+## Documentation
+
+- [ETHICS.md](ETHICS.md) — ethical-use policy, read first
+- [SCOPE.md](SCOPE.md) — authorized-scope definition
+- [CONTRIBUTING.md](CONTRIBUTING.md) — how to contribute
+- [SECURITY.md](SECURITY.md) — vulnerability reporting
+- [CHANGELOG.md](CHANGELOG.md) — version history
 
 ## Contributing
 
-Contributions are welcome! Please:
+Improvements to policy rules, additional hash algorithms, and audit reporting
+are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md); keep it offline-first and
+authorized-only.
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
----
-
-## ⚠️ Legal Disclaimer
-
-### Educational Purpose Only
-This tool is provided strictly for **educational purposes** and **authorized security testing** only. It is intended to help security professionals and students learn about security concepts in controlled environments.
-
-### Authorized Use Only
-- You must have **explicit written authorization** before testing any system you do not own
-- Unauthorized access to computer systems is **illegal** and punishable under laws including but not limited to the Computer Fraud and Abuse Act (CFAA), Computer Misuse Act, and similar legislation worldwide
-- Only use this tool on systems you own, have permission to test, or in isolated lab environments
-
-### No Warranty
-This software is provided "AS IS" without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and noninfringement. The author makes no representations or warranties regarding the accuracy, completeness, or reliability of this software.
-
-### Limitation of Liability
-**In no event shall the author (Nikhil Nagpure) be liable for any direct, indirect, incidental, special, exemplary, or consequential damages (including, but not limited to, procurement of substitute goods or services; loss of use, data, or profits; or business interruption) however caused and on any theory of liability, whether in contract, strict liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such damage.**
-
-### User Responsibility
-- The user assumes **full responsibility** for any consequences resulting from the use of this tool
-- The author is **not responsible** for any misuse, damage, or illegal activities performed with this software
-- Users are solely responsible for ensuring compliance with all applicable local, state, national, and international laws and regulations
-
-### Indemnification
-By using this software, you agree to **indemnify, defend, and hold harmless** the author from and against any and all claims, liabilities, damages, losses, costs, and expenses (including reasonable attorneys fees) arising from or related to your use of this software.
-
-### Responsible Disclosure
-If you discover vulnerabilities using this tool, please follow responsible disclosure practices and report them to the affected parties through appropriate channels.
-
----
-
-**By using this software, you acknowledge that you have read, understood, and agree to be bound by this disclaimer.**
 ## License
 
-This project is for educational purposes only. Use responsibly and ethically.
-
----
-
-**Remember**: Always get explicit authorization before auditing any passwords or hashes!
+MIT — see [LICENSE](LICENSE).
